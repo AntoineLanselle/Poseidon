@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Built-By: Lanselle
+Build-Jdk: 18.0.1
+Implementation-Title: spring-boot-skeleton
+Implementation-Version: 0.0.1-SNAPSHOT
+Implementation-Vendor-Id: net.guides.springboothelloworld
+Implementation-URL: https://projects.spring.io/spring-boot/#/spring-boot
+ -starter-parent/spring-boot-skeleton
+Created-By: Maven Integration for Eclipse
+
