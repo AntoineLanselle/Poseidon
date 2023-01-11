@@ -3,58 +3,73 @@ package com.nnk.springboot.domain;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
+/**
+ * Entity User.
+ * 
+ * @author Antoine Lanselle
+ */
 @Entity
 @Table(name = "users")
 public class User {
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private Integer id;
-    @NotBlank(message = "Username is mandatory")
-    private String username;
-    @NotBlank(message = "Password is mandatory")
-    private String password;
-    @NotBlank(message = "FullName is mandatory")
-    private String fullname;
-    @NotBlank(message = "Role is mandatory")
-    private String role;
 
-    public Integer getId() {
-        return id;
-    }
+	@Id
+	@Column(name="id")
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Integer id;
+	
+	@Column(name="username")
+	@NotBlank(message = "Username is mandatory")
+	private String username;
+	
+	@Column(name="password")
+	@NotBlank(message = "Password is mandatory")
+	private String password;
+	
+	@Column(name="fullname")
+	@NotBlank(message = "FullName is mandatory")
+	private String fullname;
+	
+	@Column(name="role")
+	@NotBlank(message = "Role is mandatory")
+	private String role;
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public Integer getId() {
+		return id;
+	}
 
-    public String getUsername() {
-        return username;
-    }
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+	public String getUsername() {
+		return username;
+	}
 
-    public String getPassword() {
-        return password;
-    }
+	public void setUsername(String username) {
+		this.username = username;
+	}
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+	public String getPassword() {
+		return password;
+	}
 
-    public String getFullname() {
-        return fullname;
-    }
+	public void setPassword(String password) {
+		this.password = password;
+	}
 
-    public void setFullname(String fullname) {
-        this.fullname = fullname;
-    }
+	public String getFullname() {
+		return fullname;
+	}
 
-    public String getRole() {
-        return role;
-    }
+	public void setFullname(String fullname) {
+		this.fullname = fullname;
+	}
 
-    public void setRole(String role) {
-        this.role = role;
-    }
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
 }

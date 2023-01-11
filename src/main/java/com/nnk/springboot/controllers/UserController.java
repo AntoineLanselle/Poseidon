@@ -14,14 +14,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
 
+/**
+ * Controller for User.
+ * 
+ * @author Antoine Lanselle
+ */
 @Controller
 public class UserController {
+	
     @Autowired
     private UserRepository userRepository;
 
     @RequestMapping("/user/list")
-    public String home(Model model)
-    {
+    public String home(Model model) {
         model.addAttribute("users", userRepository.findAll());
         return "user/list";
     }
