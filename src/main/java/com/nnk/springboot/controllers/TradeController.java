@@ -36,7 +36,6 @@ public class TradeController {
 	 * @param Model for adding attributes.
 	 * @return String the template path.
 	 */
-
 	@RequestMapping("/trade/list")
 	public String home(Model model) {
 		String info = "REQUEST - Trade List page.";

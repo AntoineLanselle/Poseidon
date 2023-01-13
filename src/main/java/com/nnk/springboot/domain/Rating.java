@@ -4,7 +4,6 @@ import javax.persistence.*;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
 
 /**
  * Entity Rating.
@@ -33,7 +32,7 @@ public class Rating {
 	private String fitchRating;
 	
 	@Column(name="order_number")
-	@NotNull(message = "Must not be null.")
+	@NotNull(message="Enter a value.")
 	@Digits(message="Enter an integer number.", fraction = 0, integer = 255)
 	private Integer orderNumber;
 

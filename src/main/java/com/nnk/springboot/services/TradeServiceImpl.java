@@ -40,7 +40,7 @@ public class TradeServiceImpl implements TradeService {
 	/**
 	 * Return specific Trade from DataBase with id in parameter.
 	 *
-	 * @param Integer the id of the Rule.
+	 * @param Integer the id of the Trade.
 	 * @return Trade with id in parameter in DataBase.
 	 * @throw RessourceNotFoundException when id in parameter is not in DataBase.
 	 */

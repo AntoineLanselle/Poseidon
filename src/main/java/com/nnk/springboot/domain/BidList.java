@@ -3,8 +3,8 @@ package com.nnk.springboot.domain;
 import javax.persistence.*;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 
 /**
@@ -30,6 +30,7 @@ public class BidList {
 	private String type;
 	
 	@Column(name="bid_quantity")
+	@NotNull(message="Enter a value.")
 	@Digits(message="Enter a number in xx.x format.", fraction = 1, integer = 255)
 	private Double bidQuantity;
 	
