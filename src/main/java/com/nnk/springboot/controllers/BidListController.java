@@ -22,8 +22,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.nnk.springboot.domain.BidList;
+import com.nnk.springboot.domain.User;
 import com.nnk.springboot.exceptions.RessourceNotFoundException;
 import com.nnk.springboot.services.BidListService;
+import com.nnk.springboot.services.UserService;
 
 /**
  * Controller for BidList.
@@ -38,6 +40,8 @@ public class BidListController {
 
 	@Autowired
 	private BidListService bidService;
+	@Autowired
+	private UserService userService;
 
 	/**
 	 * Return the template list of all Bids in DataBase.
@@ -47,9 +51,13 @@ public class BidListController {
 	 */
 	@GetMapping(path = "/list")
 	public String home(Model model) {
-		String info = "GET - BidList List page."; // TODO GET partout
+		String info = "GET - BidList List page.";
 		LOGGER.info(info);
-
+		
+		User user = userService.getCurrentUser();
+		
+		model.addAttribute("userName", user.getUsername());
+		model.addAttribute("role", user.getRole());
 		model.addAttribute("bids", bidService.findAllBids());
 		return "bidList/list";
 	}
@@ -79,8 +87,8 @@ public class BidListController {
 	 * @return String the template path.
 	 */
 	@PostMapping(path = "/validate")
-	public String validate(@Valid BidList bid, BindingResult result, Model model) {
-		String info = "POST - Add new BidList."; // TODO POST partout
+	public String validateBid(@Valid BidList bid, BindingResult result, Model model) {
+		String info = "POST - Add new BidList.";
 
 		if (!result.hasErrors()) {
 			LOGGER.info(info);
@@ -106,7 +114,7 @@ public class BidListController {
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
 	 */
 	@GetMapping(path = "/update/{id}")
-	public String showUpdateForm(@PathVariable("id") Integer id, Model model) throws RessourceNotFoundException {
+	public String showUpdateBidForm(@PathVariable("id") Integer id, Model model) throws RessourceNotFoundException {
 		String info = "GET - Update form for BidList " + id + ".";
 		LOGGER.info(info);
 
@@ -131,7 +139,7 @@ public class BidListController {
 	@PostMapping(path = "/update/{id}")
 	public String updateBid(@PathVariable("id") Integer id, @Valid BidList bidList, BindingResult result, Model model)
 			throws RessourceNotFoundException {
-		String info = "POST - Update BidList " + id + "."; // TODO POST partout
+		String info = "POST - Update BidList " + id + ".";
 
 		if (!result.hasErrors()) {
 			LOGGER.info(info);
@@ -142,7 +150,7 @@ public class BidListController {
 			model.addAttribute("bids", bidService.findAllBids());
 			return "redirect:/bidList/list";
 		} else {
-			info = info + " Fail: BidList id is not valid.";
+			info = info + " Fail: new BidList datas are not valid.";
 			LOGGER.info(info);
 
 			return "bidList/update";
@@ -160,7 +168,7 @@ public class BidListController {
 	 */
 	@GetMapping(path = "/delete/{id}")
 	public String deleteBid(@PathVariable("id") Integer id, Model model) throws RessourceNotFoundException {
-		String info = "GET - Delete BidList " + id + "."; // TODO GET partout
+		String info = "GET - Delete BidList " + id + ".";
 		LOGGER.info(info);
 
 		BidList bidList = bidService.findById(id);
@@ -177,7 +185,7 @@ public class BidListController {
 	 *         BidList List of all Bids in DataBase as body.
 	 */
 	@GetMapping(path = "/all")
-	public ResponseEntity<List<BidList>> getBidLists() {
+	public ResponseEntity<List<BidList>> getBidsList() {
 		String info = "API GET - BidList List of all Bids.";
 		LOGGER.info(info);
 
@@ -224,15 +232,12 @@ public class BidListController {
 	 * data in parameter and return https status OK with message.
 	 * 
 	 * @param BidList the Bid data to put in DataBase.
-	 * @param Integer the id of the Bid you want to update.
-	 * 
 	 * @return ResponseEntity<String> response with https status OK and message as
 	 *         body.
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
 	 */
 	@PutMapping()
-	public ResponseEntity<String> updateBidList(@RequestBody BidList bidList,
-			@RequestParam(name = "id", required = true) Integer id) throws RessourceNotFoundException {
+	public ResponseEntity<String> updateBidList(@RequestBody BidList bidList) throws RessourceNotFoundException {
 		String info = "API UPDATE - Update BidList.";
 		LOGGER.info(info);
 

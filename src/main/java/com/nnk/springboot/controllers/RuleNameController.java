@@ -1,8 +1,10 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.RuleName;
+import com.nnk.springboot.domain.User;
 import com.nnk.springboot.exceptions.RessourceNotFoundException;
 import com.nnk.springboot.services.RuleNameService;
+import com.nnk.springboot.services.UserService;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,6 +40,8 @@ public class RuleNameController {
 
 	@Autowired
 	private RuleNameService ruleNameService;
+	@Autowired
+	private UserService userService;
 
 	/**
 	 * Return the template list of all Rules in DataBase.
@@ -46,10 +50,14 @@ public class RuleNameController {
 	 * @return String the template path.
 	 */
 	@GetMapping(path = "/list")
-	public String home(Model model) {
+	public String showRules(Model model) {
 		String info = "GET - RuleName List page.";
 		LOGGER.info(info);
 
+		User user = userService.getCurrentUser();
+		
+		model.addAttribute("userName", user.getUsername());
+		model.addAttribute("role", user.getRole());
 		model.addAttribute("rules", ruleNameService.findAllRules());
 		return "ruleName/list";
 	}
@@ -79,7 +87,7 @@ public class RuleNameController {
 	 * @return String the template path.
 	 */
 	@PostMapping(path = "/validate")
-	public String validate(@Valid RuleName ruleName, BindingResult result, Model model) {
+	public String validateRule(@Valid RuleName ruleName, BindingResult result, Model model) {
 		String info = "POST - Add new RuleName.";
 
 		if (!result.hasErrors()) {
@@ -106,7 +114,7 @@ public class RuleNameController {
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
 	 */
 	@GetMapping(path = "/update/{id}")
-	public String showUpdateForm(@PathVariable("id") Integer id, Model model) throws RessourceNotFoundException {
+	public String showUpdateRuleForm(@PathVariable("id") Integer id, Model model) throws RessourceNotFoundException {
 		String info = "GET - Update form for RuleName " + id + ".";
 		LOGGER.info(info);
 
@@ -142,7 +150,7 @@ public class RuleNameController {
 			model.addAttribute("rules", ruleNameService.findAllRules());
 			return "redirect:/ruleName/list";
 		} else {
-			info = info + " Fail: RuleName id is not valid.";
+			info = info + " Fail: new RuleName datas are not valid.";
 			LOGGER.info(info);
 
 			return "ruleName/update";
@@ -224,15 +232,12 @@ public class RuleNameController {
 	 * data in parameter and return https status OK with message.
 	 * 
 	 * @param RuleName the Rule data to put in DataBase.
-	 * @param Integer  the id of the Rule you want to update.
-	 * 
 	 * @return ResponseEntity<String> response with https status OK and message as
 	 *         body.
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
 	 */
 	@PutMapping()
-	public ResponseEntity<String> updateRuleName(@RequestBody RuleName ruleName,
-			@RequestParam(name = "id", required = true) Integer id) throws RessourceNotFoundException {
+	public ResponseEntity<String> updateRuleName(@RequestBody RuleName ruleName) throws RessourceNotFoundException {
 		String info = "API UPDATE - Update RuleName.";
 		LOGGER.info(info);
 

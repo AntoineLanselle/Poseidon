@@ -1,10 +1,16 @@
 package com.nnk.springboot.services;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +21,8 @@ import com.nnk.springboot.repositories.UserRepository;
 @Service
 public class UserServiceImpl implements UserService {
 
+	//TODO verifier que les mot de passe soient conforme à la creation et update d un utilisateur
+	
 	private static final Logger LOGGER = LogManager.getLogger(UserServiceImpl.class);
 
 	@Autowired
@@ -120,6 +128,39 @@ public class UserServiceImpl implements UserService {
 		LOGGER.info(info);
 
 		return userRepository.findByUsername(username);
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public User getCurrentUser() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User user = userRepository.findByUsername(auth.getName());
+		if (user != null) {
+			return user;
+		} else if(auth.isAuthenticated()){
+			user = new User();
+			user.setRole("USER");
+			user.setUsername("GithubUser");
+			return user;
+		}	
+		return null;
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		User user = userRepository.findByUsername(username);
+		if (user == null) {
+			String error = username + "not found";
+			throw new UsernameNotFoundException(error);
+		} else {
+			return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
+					Collections.singletonList(new SimpleGrantedAuthority(user.getRole())));
+		}
 	}
 
 }

@@ -1,20 +1,29 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" 
-	  xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="utf-8"/>
 <title>Home</title>
-<link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+<link rel="stylesheet" href="../../css/bootstrap.min.css">
 </head>
 <body>
 <div class="container">
 	<div class="row">
 		<div class="col-6">
-
+			<a href="/bidList/list">Bid List</a> | 
+			<a href="/curvePoint/list">Curve Points</a> |
+			<a href="/rating/list">Ratings</a> |
+			<a href="/trade/list">Trade</a> |
+			<a href="/ruleName/list">Rule</a>
+			<span th:if="${role}==ADMIN">
+				| <a href="/user/list">User</a>
+			</span>	
 		</div>
 		<div class="col-6 text-right">
-			<a href="/">Home</a> | 
-			<a href="/login">Login</a>
+			Logged in user: 
+			<b th:inline="text" th:text="${userName}" class="user"></b>
+			<form th:action="@{/app-logout}" method="POST">
+				<input type="submit" value="Logout" />
+			</form>
 		</div>
 	</div>
 	<div class="row">

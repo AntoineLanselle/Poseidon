@@ -46,10 +46,14 @@ public class UserController {
 	 * @return String the template path.
 	 */
 	@GetMapping(path = "/list")
-	public String home(Model model) {
+	public String showUsers(Model model) {
 		String info = "GET - User List page.";
 		LOGGER.info(info);
 
+		User user = userService.getCurrentUser();
+		
+		model.addAttribute("userName", user.getUsername());
+		model.addAttribute("role", user.getRole());
 		model.addAttribute("users", userService.findAllUsers());
 		return "user/list";
 	}
@@ -79,7 +83,7 @@ public class UserController {
 	 * @return String the template path.
 	 */
 	@PostMapping(path = "/validate")
-	public String validate(@Valid User user, BindingResult result, Model model) {
+	public String validateUser(@Valid User user, BindingResult result, Model model) {
 		String info = "POST - Add new User.";
 
 		if (!result.hasErrors()) {
@@ -106,7 +110,7 @@ public class UserController {
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
 	 */
 	@GetMapping(path = "/update/{id}")
-	public String showUpdateForm(@PathVariable("id") Integer id, Model model) throws RessourceNotFoundException {
+	public String showUpdateUserForm(@PathVariable("id") Integer id, Model model) throws RessourceNotFoundException {
 		String info = "GET - Update form for User " + id + ".";
 		LOGGER.info(info);
 
@@ -143,7 +147,7 @@ public class UserController {
 			model.addAttribute("users", userService.findAllUsers());
 			return "redirect:/user/list";
 		} else {
-			info = info + " Fail: User id is not valid.";
+			info = info + " Fail: new User datas are not valid.";
 			LOGGER.info(info);
 
 			return "user/update";
@@ -170,12 +174,12 @@ public class UserController {
 		model.addAttribute("users", userService.findAllUsers());
 		return "redirect:/user/list";
 	}
-	
+
 	/**
 	 * API request - Return all Users in DataBase.
 	 * 
-	 * @return ResponseEntity<List<User> a response with https status OK and a
-	 *         User List of all Users in DataBase as body.
+	 * @return ResponseEntity<List<User> a response with https status OK and a User
+	 *         List of all Users in DataBase as body.
 	 */
 	@GetMapping(path = "/all")
 	public ResponseEntity<List<User>> getUsers() {
@@ -189,8 +193,8 @@ public class UserController {
 	 * API request - Return the User with id in parameter.
 	 * 
 	 * @param Integer the id of the User you want to get.
-	 * @return ResponseEntity<User> a response with https status OK and a User
-	 *         as body.
+	 * @return ResponseEntity<User> a response with https status OK and a User as
+	 *         body.
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
 	 */
 	@GetMapping()
@@ -203,8 +207,8 @@ public class UserController {
 	}
 
 	/**
-	 * API request - Add the User in parameter in DataBase and return https status OK
-	 * with message.
+	 * API request - Add the User in parameter in DataBase and return https status
+	 * OK with message.
 	 * 
 	 * @param User the User data to add in DataBase.
 	 * @return ResponseEntity<String> response with https status OK and message as
@@ -221,19 +225,16 @@ public class UserController {
 	}
 
 	/**
-	 * API request - Update the User with id in parameter in DataBase with User
-	 * data in parameter and return https status OK with message.
+	 * API request - Update the User with id in parameter in DataBase with User data
+	 * in parameter and return https status OK with message.
 	 * 
 	 * @param User the User data to put in DataBase.
-	 * @param Integer the id of the User you want to update.
-	 * 
 	 * @return ResponseEntity<String> response with https status OK and message as
 	 *         body.
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
 	 */
 	@PutMapping()
-	public ResponseEntity<String> updateUser(@RequestBody User user,
-			@RequestParam(name = "id", required = true) Integer id) throws RessourceNotFoundException {
+	public ResponseEntity<String> updateUser(@RequestBody User user) throws RessourceNotFoundException {
 		String info = "API UPDATE - Update User.";
 		LOGGER.info(info);
 

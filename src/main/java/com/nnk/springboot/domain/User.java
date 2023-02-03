@@ -2,6 +2,8 @@ package com.nnk.springboot.domain;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 /**
  * Entity User.
@@ -13,23 +15,25 @@ import javax.validation.constraints.NotBlank;
 public class User {
 
 	@Id
-	@Column(name="id")
+	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
-	
-	@Column(name="username")
+
+	@Column(name = "username")
 	@NotBlank(message = "Username is mandatory")
 	private String username;
-	
-	@Column(name="password")
+
+	@Column(name = "password")
 	@NotBlank(message = "Password is mandatory")
+	@Size(min = 2, max = 255, message = "Password size must be more than 8 characters")
+	@Pattern(regexp = "^(?=.*[0-9])(?=.*[A-Z])(?=.*[@%#$€]).{2,255}$", message = "Password must contain at least one number, one capital character and one special character")
 	private String password;
-	
-	@Column(name="fullname")
+
+	@Column(name = "fullname")
 	@NotBlank(message = "FullName is mandatory")
 	private String fullname;
-	
-	@Column(name="role")
+
+	@Column(name = "role")
 	@NotBlank(message = "Role is mandatory")
 	private String role;
 

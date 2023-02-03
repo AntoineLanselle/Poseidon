@@ -1,8 +1,10 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.Trade;
+import com.nnk.springboot.domain.User;
 import com.nnk.springboot.exceptions.RessourceNotFoundException;
 import com.nnk.springboot.services.TradeService;
+import com.nnk.springboot.services.UserService;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,6 +40,8 @@ public class TradeController {
 
 	@Autowired
 	private TradeService tradeService;
+	@Autowired
+	private UserService userService;
 
 	/**
 	 * Return the template list of all Trades in DataBase.
@@ -46,10 +50,14 @@ public class TradeController {
 	 * @return String the template path.
 	 */
 	@GetMapping(path = "/list")
-	public String home(Model model) {
+	public String showTrades(Model model) {
 		String info = "GET - Trade List page.";
 		LOGGER.info(info);
 
+		User user = userService.getCurrentUser();
+		
+		model.addAttribute("userName", user.getUsername());
+		model.addAttribute("role", user.getRole());
 		model.addAttribute("trades", tradeService.findAllTrades());
 		return "trade/list";
 	}
@@ -61,7 +69,7 @@ public class TradeController {
 	 * @return String of the template path.
 	 */
 	@GetMapping(path = "/add")
-	public String addUser(Trade trade) {
+	public String addTradeForm(Trade trade) {
 		String info = "GET - Creat Trade form.";
 		LOGGER.info(info);
 
@@ -79,7 +87,7 @@ public class TradeController {
 	 * @return String the template path.
 	 */
 	@PostMapping(path = "/validate")
-	public String validate(@Valid Trade trade, BindingResult result, Model model) {
+	public String validateTrade(@Valid Trade trade, BindingResult result, Model model) {
 		String info = "POST - Add new Trade.";
 
 		if (!result.hasErrors()) {
@@ -106,7 +114,7 @@ public class TradeController {
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
 	 */
 	@GetMapping(path = "/update/{id}")
-	public String showUpdateForm(@PathVariable("id") Integer id, Model model) throws RessourceNotFoundException {
+	public String showUpdateTradeForm(@PathVariable("id") Integer id, Model model) throws RessourceNotFoundException {
 		String info = "GET - Update form for Trade " + id + ".";
 		LOGGER.info(info);
 
@@ -142,7 +150,7 @@ public class TradeController {
 			model.addAttribute("trades", tradeService.findAllTrades());
 			return "redirect:/trade/list";
 		} else {
-			info = info + " Fail: Trade id is not valid.";
+			info = info + " Fail: new Trade datas are not valid.";
 			LOGGER.info(info);
 
 			return "trade/update";
@@ -169,7 +177,7 @@ public class TradeController {
 		model.addAttribute("trades", tradeService.findAllTrades());
 		return "redirect:/trade/list";
 	}
-	
+
 	/**
 	 * API request - Return all Trades in DataBase.
 	 * 
@@ -188,8 +196,8 @@ public class TradeController {
 	 * API request - Return the Trade with id in parameter.
 	 * 
 	 * @param Integer the id of the Trade you want to get.
-	 * @return ResponseEntity<Trade> a response with https status OK and a Trade
-	 *         as body.
+	 * @return ResponseEntity<Trade> a response with https status OK and a Trade as
+	 *         body.
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
 	 */
 	@GetMapping()
@@ -202,8 +210,8 @@ public class TradeController {
 	}
 
 	/**
-	 * API request - Add the Trade in parameter in DataBase and return https status OK
-	 * with message.
+	 * API request - Add the Trade in parameter in DataBase and return https status
+	 * OK with message.
 	 * 
 	 * @param Trade the Trade data to add in DataBase.
 	 * @return ResponseEntity<String> response with https status OK and message as
@@ -224,15 +232,12 @@ public class TradeController {
 	 * data in parameter and return https status OK with message.
 	 * 
 	 * @param Trade the Trade data to put in DataBase.
-	 * @param Integer the id of the Trade you want to update.
-	 * 
 	 * @return ResponseEntity<String> response with https status OK and message as
 	 *         body.
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
 	 */
 	@PutMapping()
-	public ResponseEntity<String> updateTrade(@RequestBody Trade trade,
-			@RequestParam(name = "id", required = true) Integer id) throws RessourceNotFoundException {
+	public ResponseEntity<String> updateTrade(@RequestBody Trade trade) throws RessourceNotFoundException {
 		String info = "API UPDATE - Update Trade.";
 		LOGGER.info(info);
 

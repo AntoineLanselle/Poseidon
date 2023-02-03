@@ -1,8 +1,10 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.CurvePoint;
+import com.nnk.springboot.domain.User;
 import com.nnk.springboot.exceptions.RessourceNotFoundException;
 import com.nnk.springboot.services.CurvePointService;
+import com.nnk.springboot.services.UserService;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,6 +40,8 @@ public class CurvePointController {
 
 	@Autowired
 	private CurvePointService curvePointService;
+	@Autowired
+	private UserService userService;
 
 	/**
 	 * Return the template list of all Curves in DataBase.
@@ -46,10 +50,14 @@ public class CurvePointController {
 	 * @return String the template path.
 	 */
 	@GetMapping(path = "/list")
-	public String home(Model model) {
+	public String showCurves(Model model) {
 		String info = "GET - CurvePoint List page.";
 		LOGGER.info(info);
 
+		User user = userService.getCurrentUser();
+		
+		model.addAttribute("userName", user.getUsername());
+		model.addAttribute("role", user.getRole());
 		model.addAttribute("curves", curvePointService.findAllCurves());
 		return "curvePoint/list";
 	}
@@ -61,7 +69,7 @@ public class CurvePointController {
 	 * @return String of the template path.
 	 */
 	@GetMapping(path = "/add")
-	public String addBidForm(CurvePoint curve) {
+	public String addCurveForm(CurvePoint curve) {
 		String info = "GET - Creat CurvePoint form.";
 		LOGGER.info(info);
 
@@ -79,7 +87,7 @@ public class CurvePointController {
 	 * @return String the template path.
 	 */
 	@PostMapping(path = "/validate")
-	public String validate(@Valid CurvePoint curvePoint, BindingResult result, Model model) {
+	public String validateCurve(@Valid CurvePoint curvePoint, BindingResult result, Model model) {
 		String info = "POST - Add new CurvePoint.";
 
 		if (!result.hasErrors()) {
@@ -106,7 +114,7 @@ public class CurvePointController {
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
 	 */
 	@GetMapping(path = "/update/{id}")
-	public String showUpdateForm(@PathVariable("id") Integer id, Model model) throws RessourceNotFoundException {
+	public String showUpdateCurveForm(@PathVariable("id") Integer id, Model model) throws RessourceNotFoundException {
 		String info = "GET - Update form for CurvePoint " + id + ".";
 		LOGGER.info(info);
 
@@ -129,7 +137,7 @@ public class CurvePointController {
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
 	 */
 	@PostMapping(path = "/update/{id}")
-	public String updateBid(@PathVariable("id") Integer id, @Valid CurvePoint curvePoint, BindingResult result,
+	public String updateCurve(@PathVariable("id") Integer id, @Valid CurvePoint curvePoint, BindingResult result,
 			Model model) throws RessourceNotFoundException {
 		String info = "POST - Update CurvePoint " + id + ".";
 
@@ -142,7 +150,7 @@ public class CurvePointController {
 			model.addAttribute("curves", curvePointService.findAllCurves());
 			return "redirect:/curvePoint/list";
 		} else {
-			info = info + " Fail: CurvePoint id is not valid.";
+			info = info + " Fail: new CurvePoint datas are not valid.";
 			LOGGER.info(info);
 
 			return "curvePoint/update";
@@ -159,7 +167,7 @@ public class CurvePointController {
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
 	 */
 	@GetMapping(path = "/delete/{id}")
-	public String deleteBid(@PathVariable("id") Integer id, Model model) throws RessourceNotFoundException {
+	public String deleteCurve(@PathVariable("id") Integer id, Model model) throws RessourceNotFoundException {
 		String info = "GET - Delete CurvePoint " + id + ".";
 		LOGGER.info(info);
 
@@ -224,20 +232,18 @@ public class CurvePointController {
 	 * CurvePoint data in parameter and return https status OK with message.
 	 * 
 	 * @param CurvePoint the Curve data to put in DataBase.
-	 * @param Integer    the id of the Curve you want to update.
-	 * 
 	 * @return ResponseEntity<String> response with https status OK and message as
 	 *         body.
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
 	 */
 	@PutMapping()
-	public ResponseEntity<String> updateCurvePoint(@RequestBody CurvePoint curvePoint,
-			@RequestParam(name = "id", required = true) Integer id) throws RessourceNotFoundException {
+	public ResponseEntity<String> updateCurvePoint(@RequestBody CurvePoint curvePoint)
+			throws RessourceNotFoundException {
 		String info = "API UPDATE - Update CurvePoint.";
 		LOGGER.info(info);
 
 		curvePointService.updateCurvePoint(curvePoint);
-		String msg = "BidList has been updated in DataBase.";
+		String msg = "CurvePoint has been updated in DataBase.";
 		return ResponseEntity.status(HttpStatus.OK).body(msg);
 	}
 

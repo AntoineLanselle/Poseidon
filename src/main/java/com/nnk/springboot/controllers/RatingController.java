@@ -1,8 +1,10 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.Rating;
+import com.nnk.springboot.domain.User;
 import com.nnk.springboot.exceptions.RessourceNotFoundException;
 import com.nnk.springboot.services.RatingService;
+import com.nnk.springboot.services.UserService;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,6 +40,8 @@ public class RatingController {
 
 	@Autowired
 	private RatingService ratingService;
+	@Autowired
+	private UserService userService;
 
 	/**
 	 * Return the template list of all Rating in DataBase.
@@ -46,10 +50,14 @@ public class RatingController {
 	 * @return String the template path.
 	 */
 	@GetMapping(path = "/list")
-	public String home(Model model) {
+	public String showRatings(Model model) {
 		String info = "GET - Rating List page.";
 		LOGGER.info(info);
 
+		User user = userService.getCurrentUser();
+		
+		model.addAttribute("userName", user.getUsername());
+		model.addAttribute("role", user.getRole());
 		model.addAttribute("ratings", ratingService.findAllRatings());
 		return "rating/list";
 	}
@@ -79,7 +87,7 @@ public class RatingController {
 	 * @return String the template path.
 	 */
 	@PostMapping(path = "/validate")
-	public String validate(@Valid Rating rating, BindingResult result, Model model) {
+	public String validateRating(@Valid Rating rating, BindingResult result, Model model) {
 		String info = "POST - Add new Rating.";
 
 		if (!result.hasErrors()) {
@@ -106,7 +114,7 @@ public class RatingController {
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
 	 */
 	@GetMapping(path = "/update/{id}")
-	public String showUpdateForm(@PathVariable("id") Integer id, Model model) throws RessourceNotFoundException {
+	public String showUpdateRatingForm(@PathVariable("id") Integer id, Model model) throws RessourceNotFoundException {
 		String info = "GET - Update form for Rating " + id + ".";
 		LOGGER.info(info);
 
@@ -142,7 +150,7 @@ public class RatingController {
 			model.addAttribute("ratings", ratingService.findAllRatings());
 			return "redirect:/rating/list";
 		} else {
-			info = info + " Fail: Rating id is not valid.";
+			info = info + " Fail: new Rating datas are not valid.";
 			LOGGER.info(info);
 
 			return "rating/update";
@@ -223,16 +231,13 @@ public class RatingController {
 	 * API request - Update the Rating with id in parameter in DataBase with Rating
 	 * data in parameter and return https status OK with message.
 	 * 
-	 * @param Rating  the Rating data to put in DataBase.
-	 * @param Integer the id of the Rating you want to update.
-	 * 
+	 * @param Rating the Rating data to put in DataBase.
 	 * @return ResponseEntity<String> response with https status OK and message as
 	 *         body.
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
 	 */
 	@PutMapping()
-	public ResponseEntity<String> updateRating(@RequestBody Rating rating,
-			@RequestParam(name = "id", required = true) Integer id) throws RessourceNotFoundException {
+	public ResponseEntity<String> updateRating(@RequestBody Rating rating) throws RessourceNotFoundException {
 		String info = "API UPDATE - Update Rating.";
 		LOGGER.info(info);
 
