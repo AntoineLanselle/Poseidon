@@ -20,8 +20,6 @@ import com.nnk.springboot.repositories.UserRepository;
 
 @Service
 public class UserServiceImpl implements UserService {
-
-	//TODO verifier que les mot de passe soient conforme à la creation et update d un utilisateur
 	
 	private static final Logger LOGGER = LogManager.getLogger(UserServiceImpl.class);
 

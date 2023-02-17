@@ -15,14 +15,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.ActiveProfiles;
 
 import com.nnk.springboot.domain.BidList;
 import com.nnk.springboot.exceptions.RessourceNotFoundException;
 import com.nnk.springboot.repositories.BidListRepository;
 
 @ExtendWith(MockitoExtension.class)
-//@ActiveProfiles("test")
 public class BidListServiceImplTest {
 
 	@Mock
