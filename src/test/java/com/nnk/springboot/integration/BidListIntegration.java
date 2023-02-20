@@ -26,6 +26,16 @@ public class BidListIntegration {
 	@Autowired
 	private BidListRepository bidRepository;
 
+	@Test 
+	public void validateBid_shouldAddBidInDatabase() {
+		// GIVEN
+		
+		// WHEN
+		
+		// THEN
+		
+	}
+	
 	@Test
 	public void getBidList_shouldReturnListOfBidList() throws Exception {
 		// GIVEN

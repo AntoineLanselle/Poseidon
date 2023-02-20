@@ -55,7 +55,7 @@ public class RatingController {
 		LOGGER.info(info);
 
 		User user = userService.getCurrentUser();
-		
+
 		model.addAttribute("userName", user.getUsername());
 		model.addAttribute("role", user.getRole());
 		model.addAttribute("ratings", ratingService.findAllRatings());
@@ -211,39 +211,59 @@ public class RatingController {
 
 	/**
 	 * API request - Add the Rating in parameter in DataBase and return https status
-	 * OK with message.
+	 * OK with message or CONFLICT if rating data is not valid..
 	 * 
 	 * @param Rating the Rating data to add in DataBase.
 	 * @return ResponseEntity<String> response with https status OK and message as
-	 *         body.
+	 *         body or CONFLICT if rating data is not valid.
 	 */
 	@PostMapping()
-	public ResponseEntity<String> addRating(@RequestBody Rating rating) {
+	public ResponseEntity<String> addRating(@RequestBody @Valid Rating rating, BindingResult result) {
 		String info = "API POST - Add Rating.";
-		LOGGER.info(info);
 
-		ratingService.addRating(rating);
-		String msg = "Rating has been added in DataBase.";
-		return ResponseEntity.status(HttpStatus.OK).body(msg);
+		if (!result.hasErrors()) {
+			LOGGER.info(info);
+
+			ratingService.addRating(rating);
+			String msg = "Rating has been added in DataBase.";
+			return ResponseEntity.status(HttpStatus.OK).body(msg);
+		} else {
+			String msg = "Fail: Rating data is not valid.";
+			info = info + msg;
+			LOGGER.info(info);
+
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(msg);
+		}
 	}
 
 	/**
 	 * API request - Update the Rating with id in parameter in DataBase with Rating
-	 * data in parameter and return https status OK with message.
+	 * data in parameter and return https status OK with message or CONFLICT if
+	 * rating data is not valid.
 	 * 
 	 * @param Rating the Rating data to put in DataBase.
 	 * @return ResponseEntity<String> response with https status OK and message as
-	 *         body.
+	 *         body or CONFLICT if rating data is not valid.
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
 	 */
 	@PutMapping()
-	public ResponseEntity<String> updateRating(@RequestBody Rating rating) throws RessourceNotFoundException {
+	public ResponseEntity<String> updateRating(@RequestBody @Valid Rating rating, BindingResult result)
+			throws RessourceNotFoundException {
 		String info = "API UPDATE - Update Rating.";
-		LOGGER.info(info);
 
-		ratingService.updateRating(rating);
-		String msg = "Rating has been updated in DataBase.";
-		return ResponseEntity.status(HttpStatus.OK).body(msg);
+		if (!result.hasErrors()) {
+			LOGGER.info(info);
+
+			ratingService.updateRating(rating);
+			String msg = "Rating has been updated in DataBase.";
+			return ResponseEntity.status(HttpStatus.OK).body(msg);
+		} else {
+			String msg = "Fail: Rating data is not valid.";
+			info = info + msg;
+			LOGGER.info(info);
+
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(msg);
+		}
 	}
 
 	/**

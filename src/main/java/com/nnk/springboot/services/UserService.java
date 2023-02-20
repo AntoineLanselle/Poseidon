@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.nnk.springboot.domain.User;
+import com.nnk.springboot.exceptions.AlreadyExistException;
 import com.nnk.springboot.exceptions.RessourceNotFoundException;
 
 public interface UserService extends UserDetailsService {
@@ -17,9 +18,9 @@ public interface UserService extends UserDetailsService {
 
 	public User findById(Integer id) throws RessourceNotFoundException;
 
-	public User addUser(User user);
+	public User addUser(User user) throws AlreadyExistException;
 
-	public User updateUser(User user) throws RessourceNotFoundException;
+	public User updateUser(User user) throws RessourceNotFoundException, AlreadyExistException;
 
 	public void deleteUser(User user) throws RessourceNotFoundException;
 	

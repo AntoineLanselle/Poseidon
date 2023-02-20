@@ -55,7 +55,7 @@ public class TradeController {
 		LOGGER.info(info);
 
 		User user = userService.getCurrentUser();
-		
+
 		model.addAttribute("userName", user.getUsername());
 		model.addAttribute("role", user.getRole());
 		model.addAttribute("trades", tradeService.findAllTrades());
@@ -211,39 +211,59 @@ public class TradeController {
 
 	/**
 	 * API request - Add the Trade in parameter in DataBase and return https status
-	 * OK with message.
+	 * OK with message or CONFLICT if trade data is not valid.
 	 * 
 	 * @param Trade the Trade data to add in DataBase.
 	 * @return ResponseEntity<String> response with https status OK and message as
-	 *         body.
+	 *         body or CONFLICT if trade data is not valid.
 	 */
 	@PostMapping()
-	public ResponseEntity<String> addTrade(@RequestBody Trade trade) {
+	public ResponseEntity<String> addTrade(@RequestBody @Valid Trade trade, BindingResult result) {
 		String info = "API POST - Add Trade.";
-		LOGGER.info(info);
 
-		tradeService.addTrade(trade);
-		String msg = "Trade has been added in DataBase.";
-		return ResponseEntity.status(HttpStatus.OK).body(msg);
+		if (!result.hasErrors()) {
+			LOGGER.info(info);
+
+			tradeService.addTrade(trade);
+			String msg = "Trade has been added in DataBase.";
+			return ResponseEntity.status(HttpStatus.OK).body(msg);
+		} else {
+			String msg = "Fail: Trade data is not valid.";
+			info = info + msg;
+			LOGGER.info(info);
+
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(msg);
+		}
 	}
 
 	/**
 	 * API request - Update the Trade with id in parameter in DataBase with Trade
-	 * data in parameter and return https status OK with message.
+	 * data in parameter and return https status OK with message or CONFLICT if
+	 * trade data is not valid.
 	 * 
 	 * @param Trade the Trade data to put in DataBase.
 	 * @return ResponseEntity<String> response with https status OK and message as
-	 *         body.
+	 *         body or CONFLICT if trade data is not valid.
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
 	 */
 	@PutMapping()
-	public ResponseEntity<String> updateTrade(@RequestBody Trade trade) throws RessourceNotFoundException {
+	public ResponseEntity<String> updateTrade(@RequestBody @Valid Trade trade, BindingResult result)
+			throws RessourceNotFoundException {
 		String info = "API UPDATE - Update Trade.";
-		LOGGER.info(info);
 
-		tradeService.updateTrade(trade);
-		String msg = "Trade has been updated in DataBase.";
-		return ResponseEntity.status(HttpStatus.OK).body(msg);
+		if (!result.hasErrors()) {
+			LOGGER.info(info);
+
+			tradeService.updateTrade(trade);
+			String msg = "Trade has been updated in DataBase.";
+			return ResponseEntity.status(HttpStatus.OK).body(msg);
+		} else {
+			String msg = "Fail: Trade data is not valid.";
+			info = info + msg;
+			LOGGER.info(info);
+
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(msg);
+		}
 	}
 
 	/**

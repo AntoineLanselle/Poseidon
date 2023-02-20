@@ -53,9 +53,9 @@ public class BidListController {
 	public String home(Model model) {
 		String info = "GET - BidList List page.";
 		LOGGER.info(info);
-		
+
 		User user = userService.getCurrentUser();
-		
+
 		model.addAttribute("userName", user.getUsername());
 		model.addAttribute("role", user.getRole());
 		model.addAttribute("bids", bidService.findAllBids());
@@ -211,39 +211,59 @@ public class BidListController {
 
 	/**
 	 * API request - Add the Bid in parameter in DataBase and return https status OK
-	 * with message.
+	 * with message or CONFLICT if bid data is not valid.
 	 * 
 	 * @param BidList the Bid data to add in DataBase.
 	 * @return ResponseEntity<String> response with https status OK and message as
-	 *         body.
+	 *         body or CONFLICT if bid data is not valid.
 	 */
 	@PostMapping()
-	public ResponseEntity<String> addBidList(@RequestBody BidList bidList) {
+	public ResponseEntity<String> addBidList(@RequestBody @Valid BidList bidList, BindingResult result) {
 		String info = "API POST - Add BidList.";
-		LOGGER.info(info);
 
-		bidService.addBidList(bidList);
-		String msg = "BidList has been added in DataBase.";
-		return ResponseEntity.status(HttpStatus.OK).body(msg);
+		if (!result.hasErrors()) {
+			LOGGER.info(info);
+
+			bidService.addBidList(bidList);
+			String msg = "BidList has been added in DataBase.";
+			return ResponseEntity.status(HttpStatus.OK).body(msg);
+		} else {
+			String msg = "Fail: BidList data is not valid.";
+			info = info + msg;
+			LOGGER.info(info);
+
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(msg);
+		}
 	}
 
 	/**
 	 * API request - Update the Bid with id in parameter in DataBase with BidList
-	 * data in parameter and return https status OK with message.
+	 * data in parameter and return https status OK with message or CONFLICT if bid
+	 * data is not valid.
 	 * 
 	 * @param BidList the Bid data to put in DataBase.
 	 * @return ResponseEntity<String> response with https status OK and message as
-	 *         body.
+	 *         body or CONFLICT if bid data is not valid.
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
 	 */
 	@PutMapping()
-	public ResponseEntity<String> updateBidList(@RequestBody BidList bidList) throws RessourceNotFoundException {
+	public ResponseEntity<String> updateBidList(@RequestBody @Valid BidList bidList, BindingResult result)
+			throws RessourceNotFoundException {
 		String info = "API UPDATE - Update BidList.";
-		LOGGER.info(info);
 
-		bidService.updateBidList(bidList);
-		String msg = "BidList has been updated in DataBase.";
-		return ResponseEntity.status(HttpStatus.OK).body(msg);
+		if (!result.hasErrors()) {
+			LOGGER.info(info);
+
+			bidService.updateBidList(bidList);
+			String msg = "BidList has been updated in DataBase.";
+			return ResponseEntity.status(HttpStatus.OK).body(msg);
+		} else {
+			String msg = "Fail: BidList data is not valid.";
+			info = info + msg;
+			LOGGER.info(info);
+
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(msg);
+		}
 	}
 
 	/**

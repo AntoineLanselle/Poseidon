@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.nnk.springboot.exceptions.AlreadyExistException;
 import com.nnk.springboot.exceptions.RessourceNotFoundException;
 
 /**
@@ -26,6 +27,19 @@ public class GlobalControllerExceptionHandler {
 	public ResponseEntity<String> handletNotFoundException(RessourceNotFoundException ex) {
 		String error = ex.getMessage();
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+	}
+	
+	/**
+	 * Handles the AlreadyExist error.
+	 * 
+	 * @param AlreadyExistException the error.
+	 * @return ResponseEntity<String> with status CONFLICT and error message as
+	 *         body.
+	 */
+	@ExceptionHandler(AlreadyExistException.class)
+	public ResponseEntity<String> handletAlreadyExistException(AlreadyExistException ex) {
+		String error = ex.getMessage();
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
 	}
 
 }

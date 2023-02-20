@@ -1,6 +1,7 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.User;
+import com.nnk.springboot.exceptions.AlreadyExistException;
 import com.nnk.springboot.exceptions.RessourceNotFoundException;
 import com.nnk.springboot.services.UserService;
 
@@ -51,7 +52,7 @@ public class UserController {
 		LOGGER.info(info);
 
 		User user = userService.getCurrentUser();
-		
+
 		model.addAttribute("userName", user.getUsername());
 		model.addAttribute("role", user.getRole());
 		model.addAttribute("users", userService.findAllUsers());
@@ -81,9 +82,10 @@ public class UserController {
 	 * @param Model         for adding attributes.
 	 * 
 	 * @return String the template path.
+	 * @throws AlreadyExistException when username of user already exist.
 	 */
 	@PostMapping(path = "/validate")
-	public String validateUser(@Valid User user, BindingResult result, Model model) {
+	public String validateUser(@Valid User user, BindingResult result, Model model) throws AlreadyExistException {
 		String info = "POST - Add new User.";
 
 		if (!result.hasErrors()) {
@@ -132,10 +134,11 @@ public class UserController {
 	 * 
 	 * @return String the template path.
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
+	 * @throws AlreadyExistException      when username of user already exist.
 	 */
 	@PostMapping(path = "/update/{id}")
 	public String updateUser(@PathVariable("id") Integer id, @Valid User user, BindingResult result, Model model)
-			throws RessourceNotFoundException {
+			throws RessourceNotFoundException, AlreadyExistException {
 		String info = "POST - Update User " + id + ".";
 
 		if (!result.hasErrors()) {
@@ -208,39 +211,68 @@ public class UserController {
 
 	/**
 	 * API request - Add the User in parameter in DataBase and return https status
-	 * OK with message.
+	 * OK with message or CONFLICT if user data is not valid.
 	 * 
-	 * @param User the User data to add in DataBase.
+	 * @param User          the User data to add in DataBase.
+	 * @param BindingResult verification if User in parameter is valid with
+	 *                      constraints.
+	 * 
 	 * @return ResponseEntity<String> response with https status OK and message as
 	 *         body.
+	 * @throws AlreadyExistException when username of user already exist.
 	 */
 	@PostMapping()
-	public ResponseEntity<String> addUser(@RequestBody User user) {
+	public ResponseEntity<String> addUser(@RequestBody @Valid User user, BindingResult result)
+			throws AlreadyExistException {
 		String info = "API POST - Add User.";
-		LOGGER.info(info);
 
-		userService.addUser(user);
-		String msg = "User has been added in DataBase.";
-		return ResponseEntity.status(HttpStatus.OK).body(msg);
+		if (!result.hasErrors()) {
+			LOGGER.info(info);
+
+			userService.addUser(user);
+			String msg = "User has been added in DataBase.";
+			return ResponseEntity.status(HttpStatus.OK).body(msg);
+		} else {
+			String msg = "Fail: User data is not valid.";
+			info = info + msg;
+			LOGGER.info(info);
+
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(msg);
+		}
 	}
 
 	/**
 	 * API request - Update the User with id in parameter in DataBase with User data
-	 * in parameter and return https status OK with message.
+	 * in parameter and return https status OK with message or CONFLIT if user data
+	 * is not valid.
 	 * 
-	 * @param User the User data to put in DataBase.
+	 * @param User          the User data to put in DataBase.
+	 * @param BindingResult verification if User in parameter is valid with
+	 *                      constraints.
+	 * 
 	 * @return ResponseEntity<String> response with https status OK and message as
 	 *         body.
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
+	 * @throws AlreadyExistException      when username of user already exist.
 	 */
 	@PutMapping()
-	public ResponseEntity<String> updateUser(@RequestBody User user) throws RessourceNotFoundException {
+	public ResponseEntity<String> updateUser(@RequestBody @Valid User user, BindingResult result)
+			throws RessourceNotFoundException, AlreadyExistException {
 		String info = "API UPDATE - Update User.";
-		LOGGER.info(info);
 
-		userService.updateUser(user);
-		String msg = "User has been updated in DataBase.";
-		return ResponseEntity.status(HttpStatus.OK).body(msg);
+		if (!result.hasErrors()) {
+			LOGGER.info(info);
+
+			userService.updateUser(user);
+			String msg = "User has been updated in DataBase.";
+			return ResponseEntity.status(HttpStatus.OK).body(msg);
+		} else {
+			String msg = "Fail: User data is not valid.";
+			info = info + msg;
+			LOGGER.info(info);
+
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(msg);
+		}
 	}
 
 	/**

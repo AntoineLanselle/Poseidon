@@ -16,11 +16,12 @@ import org.springframework.stereotype.Service;
 
 import com.nnk.springboot.domain.User;
 import com.nnk.springboot.exceptions.RessourceNotFoundException;
+import com.nnk.springboot.exceptions.AlreadyExistException;
 import com.nnk.springboot.repositories.UserRepository;
 
 @Service
 public class UserServiceImpl implements UserService {
-	
+
 	private static final Logger LOGGER = LogManager.getLogger(UserServiceImpl.class);
 
 	@Autowired
@@ -60,15 +61,21 @@ public class UserServiceImpl implements UserService {
 	 *
 	 * @param User you want to add in DataBase.
 	 * @return User the added Trade.
+	 * @throws AlreadyExistException when username of user already exist.
 	 */
 	@Override
-	public User addUser(User user) {
+	public User addUser(User user) throws AlreadyExistException {
 		String info = "Adding User in DataBase.";
 		LOGGER.info(info);
 
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		user.setPassword(encoder.encode(user.getPassword()));
-		return userRepository.save(user);
+		if (findByUsername(user.getUsername()) == null) {
+			BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+			user.setPassword(encoder.encode(user.getPassword()));
+			return userRepository.save(user);
+		} else {
+			String error = "Fail: User with username " + user.getUsername() + " already exist in DataBase.";
+			throw new AlreadyExistException(error);
+		}
 	}
 
 	/**
@@ -76,18 +83,26 @@ public class UserServiceImpl implements UserService {
 	 *
 	 * @param User the new User data we want to update.
 	 * @return User the updated User.
+	 * @throws AlreadyExistException when username of user already exist.
 	 * @throw RessourceNotFoundException when User id in parameter is not in
 	 *        DataBase.
 	 */
 	@Override
-	public User updateUser(User user) throws RessourceNotFoundException {
+	public User updateUser(User user) throws RessourceNotFoundException, AlreadyExistException {
 		String info = "Updating User in DataBase.";
 		LOGGER.info(info);
 
 		if (userRepository.existsById(user.getId())) {
-			BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-			user.setPassword(encoder.encode(user.getPassword()));
-			return userRepository.save(user);
+			// checking if the new username doesn't exist or already taken by this user
+			if (findByUsername(user.getUsername()) == null
+					|| findByUsername(user.getUsername()).getId() == user.getId()) {
+				BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+				user.setPassword(encoder.encode(user.getPassword()));
+				return userRepository.save(user);
+			} else {
+				String error = "Fail: User with username " + user.getUsername() + " already exist in DataBase.";
+				throw new AlreadyExistException(error);
+			}
 		} else {
 			String error = "Fail: User with id " + user.getId() + " not found in DataBase.";
 			throw new RessourceNotFoundException(error);
@@ -127,7 +142,7 @@ public class UserServiceImpl implements UserService {
 
 		return userRepository.findByUsername(username);
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -137,15 +152,15 @@ public class UserServiceImpl implements UserService {
 		User user = userRepository.findByUsername(auth.getName());
 		if (user != null) {
 			return user;
-		} else if(auth.isAuthenticated()){
+		} else if (auth.isAuthenticated()) {
 			user = new User();
 			user.setRole("USER");
 			user.setUsername("GithubUser");
 			return user;
-		}	
+		}
 		return null;
 	}
-	
+
 	/**
 	 * 
 	 */

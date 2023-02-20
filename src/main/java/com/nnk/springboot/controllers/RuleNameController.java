@@ -55,7 +55,7 @@ public class RuleNameController {
 		LOGGER.info(info);
 
 		User user = userService.getCurrentUser();
-		
+
 		model.addAttribute("userName", user.getUsername());
 		model.addAttribute("role", user.getRole());
 		model.addAttribute("rules", ruleNameService.findAllRules());
@@ -211,39 +211,59 @@ public class RuleNameController {
 
 	/**
 	 * API request - Add the Rule in parameter in DataBase and return https status
-	 * OK with message.
+	 * OK with message or CONFLICT if rule data is not valid..
 	 * 
 	 * @param RuleName the Rule data to add in DataBase.
 	 * @return ResponseEntity<String> response with https status OK and message as
-	 *         body.
+	 *         body or CONFLICT if rule data is not valid.
 	 */
 	@PostMapping()
-	public ResponseEntity<String> addRuleName(@RequestBody RuleName ruleName) {
-		String info = "API POST - Add BidList.";
-		LOGGER.info(info);
+	public ResponseEntity<String> addRuleName(@RequestBody @Valid RuleName ruleName, BindingResult result) {
+		String info = "API POST - Add RuleName.";
 
-		ruleNameService.addRuleName(ruleName);
-		String msg = "RuleName has been added in DataBase.";
-		return ResponseEntity.status(HttpStatus.OK).body(msg);
+		if (!result.hasErrors()) {
+			LOGGER.info(info);
+
+			ruleNameService.addRuleName(ruleName);
+			String msg = "RuleName has been added in DataBase.";
+			return ResponseEntity.status(HttpStatus.OK).body(msg);
+		} else {
+			String msg = "Fail: RuleName data is not valid.";
+			info = info + msg;
+			LOGGER.info(info);
+
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(msg);
+		}
 	}
 
 	/**
 	 * API request - Update the Rule with id in parameter in DataBase with RuleName
-	 * data in parameter and return https status OK with message.
+	 * data in parameter and return https status OK with message or CONFLICT if rule
+	 * data is not valid.
 	 * 
 	 * @param RuleName the Rule data to put in DataBase.
 	 * @return ResponseEntity<String> response with https status OK and message as
-	 *         body.
+	 *         bodyor CONFLICT if rule data is not valid.
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
 	 */
 	@PutMapping()
-	public ResponseEntity<String> updateRuleName(@RequestBody RuleName ruleName) throws RessourceNotFoundException {
+	public ResponseEntity<String> updateRuleName(@RequestBody @Valid RuleName ruleName, BindingResult result)
+			throws RessourceNotFoundException {
 		String info = "API UPDATE - Update RuleName.";
-		LOGGER.info(info);
 
-		ruleNameService.updateRuleName(ruleName);
-		String msg = "RuleName has been updated in DataBase.";
-		return ResponseEntity.status(HttpStatus.OK).body(msg);
+		if (!result.hasErrors()) {
+			LOGGER.info(info);
+
+			ruleNameService.updateRuleName(ruleName);
+			String msg = "RuleName has been updated in DataBase.";
+			return ResponseEntity.status(HttpStatus.OK).body(msg);
+		} else {
+			String msg = "Fail: RuleName data is not valid.";
+			info = info + msg;
+			LOGGER.info(info);
+
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(msg);
+		}
 	}
 
 	/**

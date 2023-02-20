@@ -55,7 +55,7 @@ public class CurvePointController {
 		LOGGER.info(info);
 
 		User user = userService.getCurrentUser();
-		
+
 		model.addAttribute("userName", user.getUsername());
 		model.addAttribute("role", user.getRole());
 		model.addAttribute("curves", curvePointService.findAllCurves());
@@ -211,40 +211,59 @@ public class CurvePointController {
 
 	/**
 	 * API request - Add the Curve in parameter in DataBase and return https status
-	 * OK with message.
+	 * OK with message or CONFLICT if curve data is not valid..
 	 * 
 	 * @param CurvePoint the Curve data to add in DataBase.
 	 * @return ResponseEntity<String> response with https status OK and message as
-	 *         body.
+	 *         body or CONFLICT if curve data is not valid..
 	 */
 	@PostMapping()
-	public ResponseEntity<String> addCurvePoint(@RequestBody CurvePoint curvePoint) {
+	public ResponseEntity<String> addCurvePoint(@RequestBody @Valid CurvePoint curvePoint, BindingResult result) {
 		String info = "API POST - Add CurvePoint.";
-		LOGGER.info(info);
 
-		curvePointService.addCurvePoint(curvePoint);
-		String msg = "CurvePoint has been added in DataBase.";
-		return ResponseEntity.status(HttpStatus.OK).body(msg);
+		if (!result.hasErrors()) {
+			LOGGER.info(info);
+
+			curvePointService.addCurvePoint(curvePoint);
+			String msg = "CurvePoint has been added in DataBase.";
+			return ResponseEntity.status(HttpStatus.OK).body(msg);
+		} else {
+			String msg = "Fail: Curve data is not valid.";
+			info = info + msg;
+			LOGGER.info(info);
+
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(msg);
+		}
 	}
 
 	/**
 	 * API request - Update the Curve with id in parameter in DataBase with
-	 * CurvePoint data in parameter and return https status OK with message.
+	 * CurvePoint data in parameter and return https status OK with message or
+	 * CONFLICT if curve data is not valid..
 	 * 
 	 * @param CurvePoint the Curve data to put in DataBase.
 	 * @return ResponseEntity<String> response with https status OK and message as
-	 *         body.
+	 *         body or CONFLICT if curve data is not valid..
 	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
 	 */
 	@PutMapping()
-	public ResponseEntity<String> updateCurvePoint(@RequestBody CurvePoint curvePoint)
+	public ResponseEntity<String> updateCurvePoint(@RequestBody @Valid CurvePoint curvePoint, BindingResult result)
 			throws RessourceNotFoundException {
 		String info = "API UPDATE - Update CurvePoint.";
-		LOGGER.info(info);
 
-		curvePointService.updateCurvePoint(curvePoint);
-		String msg = "CurvePoint has been updated in DataBase.";
-		return ResponseEntity.status(HttpStatus.OK).body(msg);
+		if (!result.hasErrors()) {
+			LOGGER.info(info);
+
+			curvePointService.updateCurvePoint(curvePoint);
+			String msg = "CurvePoint has been updated in DataBase.";
+			return ResponseEntity.status(HttpStatus.OK).body(msg);
+		} else {
+			String msg = "Fail: Curve data is not valid.";
+			info = info + msg;
+			LOGGER.info(info);
+
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(msg);
+		}
 	}
 
 	/**
