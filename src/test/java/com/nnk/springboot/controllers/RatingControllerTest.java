@@ -175,13 +175,29 @@ public class RatingControllerTest {
 	public void addRating_ShouldReturnResponseEntityWithStatusOKAndMessageAsBody() throws RessourceNotFoundException {
 		// GIVEN
 		Rating rating = new Rating();
+		BindingResult result = mock(BindingResult.class);
 
 		// WHEN
-		ResponseEntity<String> testResult = ratingController.addRating(rating);
+		ResponseEntity<String> testResult = ratingController.addRating(rating, result);
 
 		// THEN
 		assertEquals(HttpStatus.OK, testResult.getStatusCode());
 		assertEquals("Rating has been added in DataBase.", testResult.getBody());
+	}
+	
+	@Test
+	public void addRating_ShouldReturnResponseEntityWithStatusCONFLICTAndMessageAsBody() throws RessourceNotFoundException {
+		// GIVEN
+		Rating rating = new Rating();
+		BindingResult result = mock(BindingResult.class);
+		when(result.hasErrors()).thenReturn(true);
+
+		// WHEN
+		ResponseEntity<String> testResult = ratingController.addRating(rating, result);
+
+		// THEN
+		assertEquals(HttpStatus.CONFLICT, testResult.getStatusCode());
+		assertEquals("Fail: Rating data is not valid.", testResult.getBody());
 	}
 
 	@Test
@@ -189,13 +205,29 @@ public class RatingControllerTest {
 			throws RessourceNotFoundException {
 		// GIVEN
 		Rating rating = new Rating();
+		BindingResult result = mock(BindingResult.class);
 
 		// WHEN
-		ResponseEntity<String> testResult = ratingController.updateRating(rating);
+		ResponseEntity<String> testResult = ratingController.updateRating(rating, result);
 
 		// THEN
 		assertEquals(HttpStatus.OK, testResult.getStatusCode());
 		assertEquals("Rating has been updated in DataBase.", testResult.getBody());
+	}
+	
+	@Test
+	public void updateRating_ShouldReturnResponseEntityWithStatusCONFLICTAndMessageAsBody() throws RessourceNotFoundException {
+		// GIVEN
+		Rating rating = new Rating();
+		BindingResult result = mock(BindingResult.class);
+		when(result.hasErrors()).thenReturn(true);
+
+		// WHEN
+		ResponseEntity<String> testResult = ratingController.updateRating(rating, result);
+
+		// THEN
+		assertEquals(HttpStatus.CONFLICT, testResult.getStatusCode());
+		assertEquals("Fail: Rating data is not valid.", testResult.getBody());
 	}
 
 	@Test

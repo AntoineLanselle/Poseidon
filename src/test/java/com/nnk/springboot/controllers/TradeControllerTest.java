@@ -175,26 +175,58 @@ public class TradeControllerTest {
 	public void addTrade_ShouldReturnResponseEntityWithStatusOKAndMessageAsBody() throws RessourceNotFoundException {
 		// GIVEN
 		Trade trade = new Trade();
+		BindingResult result = mock(BindingResult.class);
 
 		// WHEN
-		ResponseEntity<String> testResult = tradeController.addTrade(trade);
+		ResponseEntity<String> testResult = tradeController.addTrade(trade, result);
 
 		// THEN
 		assertEquals(HttpStatus.OK, testResult.getStatusCode());
 		assertEquals("Trade has been added in DataBase.", testResult.getBody());
+	}
+	
+	@Test
+	public void addTrade_ShouldReturnResponseEntityWithStatusCONFLICTAndMessageAsBody() throws RessourceNotFoundException {
+		// GIVEN
+		Trade trade = new Trade();
+		BindingResult result = mock(BindingResult.class);
+		when(result.hasErrors()).thenReturn(true);
+
+		// WHEN
+		ResponseEntity<String> testResult = tradeController.addTrade(trade, result);
+
+		// THEN
+		assertEquals(HttpStatus.CONFLICT, testResult.getStatusCode());
+		assertEquals("Fail: Trade data is not valid.", testResult.getBody());
 	}
 
 	@Test
 	public void updateTrade_ShouldReturnResponseEntityWithStatusOKAndMessageAsBody() throws RessourceNotFoundException {
 		// GIVEN
 		Trade trade = new Trade();
+		BindingResult result = mock(BindingResult.class);
 
 		// WHEN
-		ResponseEntity<String> testResult = tradeController.updateTrade(trade);
+		ResponseEntity<String> testResult = tradeController.updateTrade(trade, result);
 
 		// THEN
 		assertEquals(HttpStatus.OK, testResult.getStatusCode());
 		assertEquals("Trade has been updated in DataBase.", testResult.getBody());
+	}
+	
+	@Test
+	public void updateTrade_ShouldReturnResponseEntityWithStatusCONFLICTAndMessageAsBody() throws RessourceNotFoundException {
+		// GIVEN
+		Trade trade = new Trade();
+		BindingResult result = mock(BindingResult.class);
+		when(result.hasErrors()).thenReturn(true);
+
+		// WHEN
+		ResponseEntity<String> testResult = tradeController.updateTrade(trade, result);
+
+		// THEN
+		assertEquals(HttpStatus.CONFLICT, testResult.getStatusCode());
+		assertEquals("Fail: Trade data is not valid.", testResult.getBody());
 	}
 
 	@Test

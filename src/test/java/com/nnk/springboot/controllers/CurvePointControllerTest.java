@@ -176,13 +176,29 @@ public class CurvePointControllerTest {
 			throws RessourceNotFoundException {
 		// GIVEN
 		CurvePoint curve = new CurvePoint();
+		BindingResult result = mock(BindingResult.class);
 
 		// WHEN
-		ResponseEntity<String> testResult = curvePointController.addCurvePoint(curve);
+		ResponseEntity<String> testResult = curvePointController.addCurvePoint(curve, result);
 
 		// THEN
 		assertEquals(HttpStatus.OK, testResult.getStatusCode());
 		assertEquals("CurvePoint has been added in DataBase.", testResult.getBody());
+	}
+	
+	@Test
+	public void addCurvePoint_ShouldReturnResponseEntityWithStatusCONFLICTAndMessageAsBody() throws RessourceNotFoundException {
+		// GIVEN
+		CurvePoint curve = new CurvePoint();
+		BindingResult result = mock(BindingResult.class);
+		when(result.hasErrors()).thenReturn(true);
+
+		// WHEN
+		ResponseEntity<String> testResult = curvePointController.addCurvePoint(curve, result);
+
+		// THEN
+		assertEquals(HttpStatus.CONFLICT, testResult.getStatusCode());
+		assertEquals("Fail: Curve data is not valid.", testResult.getBody());
 	}
 
 	@Test
@@ -190,13 +206,29 @@ public class CurvePointControllerTest {
 			throws RessourceNotFoundException {
 		// GIVEN
 		CurvePoint curve = new CurvePoint();
+		BindingResult result = mock(BindingResult.class);
 
 		// WHEN
-		ResponseEntity<String> testResult = curvePointController.updateCurvePoint(curve);
+		ResponseEntity<String> testResult = curvePointController.updateCurvePoint(curve, result);
 
 		// THEN
 		assertEquals(HttpStatus.OK, testResult.getStatusCode());
 		assertEquals("CurvePoint has been updated in DataBase.", testResult.getBody());
+	}
+	
+	@Test
+	public void updateCurvePoint_ShouldReturnResponseEntityWithStatusCONFLICTAndMessageAsBody() throws RessourceNotFoundException {
+		// GIVEN
+		CurvePoint curve = new CurvePoint();
+		BindingResult result = mock(BindingResult.class);
+		when(result.hasErrors()).thenReturn(true);
+
+		// WHEN
+		ResponseEntity<String> testResult = curvePointController.updateCurvePoint(curve, result);
+
+		// THEN
+		assertEquals(HttpStatus.CONFLICT, testResult.getStatusCode());
+		assertEquals("Fail: Curve data is not valid.", testResult.getBody());
 	}
 
 	@Test

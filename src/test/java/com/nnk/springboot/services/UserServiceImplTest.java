@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.nnk.springboot.domain.User;
+import com.nnk.springboot.exceptions.AlreadyExistException;
 import com.nnk.springboot.exceptions.RessourceNotFoundException;
 import com.nnk.springboot.repositories.UserRepository;
 
@@ -79,7 +80,7 @@ public class UserServiceImplTest {
 	}
 	
 	@Test
-	public void addUser_ShouldReturnUserInParameter() throws RessourceNotFoundException {
+	public void addUser_ShouldReturnUserInParameter() throws RessourceNotFoundException, AlreadyExistException {
 		// GIVEN
 		when(userRepository.save(userRepo.get(0))).thenReturn(userRepo.get(0));
 		
@@ -91,7 +92,7 @@ public class UserServiceImplTest {
 	}
 	
 	@Test
-	public void updateUser_ShouldReturnUserInParameter() throws RessourceNotFoundException {
+	public void updateUser_ShouldReturnUserInParameter() throws RessourceNotFoundException, AlreadyExistException {
 		// GIVEN
 		User user = new User(); 
 		user.setPassword("password");

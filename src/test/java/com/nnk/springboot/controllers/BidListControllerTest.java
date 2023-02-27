@@ -175,13 +175,29 @@ public class BidListControllerTest {
 	public void addBidList_ShouldReturnResponseEntityWithStatusOKAndMessageAsBody() throws RessourceNotFoundException {
 		// GIVEN
 		BidList bid = new BidList();
+		BindingResult result = mock(BindingResult.class);
 
 		// WHEN
-		ResponseEntity<String> testResult = bidListController.addBidList(bid);
+		ResponseEntity<String> testResult = bidListController.addBidList(bid, result);
 
 		// THEN
 		assertEquals(HttpStatus.OK, testResult.getStatusCode());
 		assertEquals("BidList has been added in DataBase.", testResult.getBody());
+	}
+	
+	@Test
+	public void addBidList_ShouldReturnResponseEntityWithStatusCONFLICTAndMessageAsBody() throws RessourceNotFoundException {
+		// GIVEN
+		BidList bid = new BidList();
+		BindingResult result = mock(BindingResult.class);
+		when(result.hasErrors()).thenReturn(true);
+
+		// WHEN
+		ResponseEntity<String> testResult = bidListController.addBidList(bid, result);
+
+		// THEN
+		assertEquals(HttpStatus.CONFLICT, testResult.getStatusCode());
+		assertEquals("Fail: BidList data is not valid.", testResult.getBody());
 	}
 
 	@Test
@@ -189,15 +205,32 @@ public class BidListControllerTest {
 			throws RessourceNotFoundException {
 		// GIVEN
 		BidList bid = new BidList();
+		BindingResult result = mock(BindingResult.class);
 
 		// WHEN
-		ResponseEntity<String> testResult = bidListController.updateBidList(bid);
+		ResponseEntity<String> testResult = bidListController.updateBidList(bid, result);
 
 		// THEN
 		assertEquals(HttpStatus.OK, testResult.getStatusCode());
 		assertEquals("BidList has been updated in DataBase.", testResult.getBody());
 	}
 
+	
+	@Test
+	public void updateBidList_ShouldReturnResponseEntityWithStatusCONFLICTAndMessageAsBody() throws RessourceNotFoundException {
+		// GIVEN
+		BidList bid = new BidList();
+		BindingResult result = mock(BindingResult.class);
+		when(result.hasErrors()).thenReturn(true);
+
+		// WHEN
+		ResponseEntity<String> testResult = bidListController.updateBidList(bid, result);
+
+		// THEN
+		assertEquals(HttpStatus.CONFLICT, testResult.getStatusCode());
+		assertEquals("Fail: BidList data is not valid.", testResult.getBody());
+	}
+	
 	@Test
 	public void deleteBidList_ShouldReturnResponseEntityWithStatusOKAndMessageAsBody()
 			throws RessourceNotFoundException {

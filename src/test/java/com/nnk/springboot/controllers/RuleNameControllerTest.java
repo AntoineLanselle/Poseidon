@@ -175,13 +175,29 @@ public class RuleNameControllerTest {
 	public void addRuleName_ShouldReturnResponseEntityWithStatusOKAndMessageAsBody() throws RessourceNotFoundException {
 		// GIVEN
 		RuleName rule = new RuleName();
+		BindingResult result = mock(BindingResult.class);
 
 		// WHEN
-		ResponseEntity<String> testResult = ruleNameController.addRuleName(rule);
+		ResponseEntity<String> testResult = ruleNameController.addRuleName(rule, result);
 
 		// THEN
 		assertEquals(HttpStatus.OK, testResult.getStatusCode());
 		assertEquals("RuleName has been added in DataBase.", testResult.getBody());
+	}
+	
+	@Test
+	public void addRuleName_ShouldReturnResponseEntityWithStatusCONFLICTAndMessageAsBody() throws RessourceNotFoundException {
+		// GIVEN
+		RuleName rule = new RuleName();
+		BindingResult result = mock(BindingResult.class);
+		when(result.hasErrors()).thenReturn(true);
+
+		// WHEN
+		ResponseEntity<String> testResult = ruleNameController.addRuleName(rule, result);
+
+		// THEN
+		assertEquals(HttpStatus.CONFLICT, testResult.getStatusCode());
+		assertEquals("Fail: RuleName data is not valid.", testResult.getBody());
 	}
 
 	@Test
@@ -189,13 +205,29 @@ public class RuleNameControllerTest {
 			throws RessourceNotFoundException {
 		// GIVEN
 		RuleName rule = new RuleName();
+		BindingResult result = mock(BindingResult.class);
 
 		// WHEN
-		ResponseEntity<String> testResult = ruleNameController.updateRuleName(rule);
+		ResponseEntity<String> testResult = ruleNameController.updateRuleName(rule, result);
 
 		// THEN
 		assertEquals(HttpStatus.OK, testResult.getStatusCode());
 		assertEquals("RuleName has been updated in DataBase.", testResult.getBody());
+	}
+	
+	@Test
+	public void updateRuleName_ShouldReturnResponseEntityWithStatusCONFLICTAndMessageAsBody() throws RessourceNotFoundException {
+		// GIVEN
+		RuleName rule = new RuleName();
+		BindingResult result = mock(BindingResult.class);
+		when(result.hasErrors()).thenReturn(true);
+
+		// WHEN
+		ResponseEntity<String> testResult = ruleNameController.addRuleName(rule, result);
+
+		// THEN
+		assertEquals(HttpStatus.CONFLICT, testResult.getStatusCode());
+		assertEquals("Fail: RuleName data is not valid.", testResult.getBody());
 	}
 
 	@Test

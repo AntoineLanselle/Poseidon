@@ -19,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
 import com.nnk.springboot.domain.User;
+import com.nnk.springboot.exceptions.AlreadyExistException;
 import com.nnk.springboot.exceptions.RessourceNotFoundException;
 import com.nnk.springboot.services.UserService;
 
@@ -59,7 +60,7 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void validate_ShouldRedirectToUser() {
+	public void validate_ShouldRedirectToUser() throws AlreadyExistException {
 		// GIVEN
 		BindingResult result = mock(BindingResult.class);
 		when(!result.hasErrors()).thenReturn(false);
@@ -72,7 +73,7 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void validate_ShouldStringOfTemplatePathUserAdd() {
+	public void validate_ShouldStringOfTemplatePathUserAdd() throws AlreadyExistException {
 		// GIVEN
 		BindingResult result = mock(BindingResult.class);
 		when(!result.hasErrors()).thenReturn(true);
@@ -97,7 +98,7 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void updateUser_ShouldRedirectToUser() throws RessourceNotFoundException {
+	public void updateUser_ShouldRedirectToUser() throws RessourceNotFoundException, AlreadyExistException {
 		// GIVEN
 		BindingResult result = mock(BindingResult.class);
 		when(!result.hasErrors()).thenReturn(false);
@@ -110,7 +111,7 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void updateUser_ShouldReturnStringOfTemplatePath() throws RessourceNotFoundException {
+	public void updateUser_ShouldReturnStringOfTemplatePath() throws RessourceNotFoundException, AlreadyExistException {
 		// GIVEN
 		BindingResult result = mock(BindingResult.class);
 		when(!result.hasErrors()).thenReturn(true);
@@ -167,31 +168,63 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void addCurvePoint_ShouldReturnResponseEntityWithStatusOKAndMessageAsBody()
-			throws RessourceNotFoundException {
+	public void addUser_ShouldReturnResponseEntityWithStatusOKAndMessageAsBody()
+			throws RessourceNotFoundException, AlreadyExistException {
 		// GIVEN
 		User user = new User();
+		BindingResult result = mock(BindingResult.class);
 
 		// WHEN
-		ResponseEntity<String> testResult = userController.addUser(user);
+		ResponseEntity<String> testResult = userController.addUser(user, result);
 
 		// THEN
 		assertEquals(HttpStatus.OK, testResult.getStatusCode());
 		assertEquals("User has been added in DataBase.", testResult.getBody());
 	}
-
+	
 	@Test
-	public void updateCurvePoint_ShouldReturnResponseEntityWithStatusOKAndMessageAsBody()
-			throws RessourceNotFoundException {
+	public void addUser_ShouldReturnResponseEntityWithStatusCONFLICTAndMessageAsBody() throws RessourceNotFoundException, AlreadyExistException {
 		// GIVEN
 		User user = new User();
+		BindingResult result = mock(BindingResult.class);
+		when(result.hasErrors()).thenReturn(true);
 
 		// WHEN
-		ResponseEntity<String> testResult = userController.updateUser(user);
+		ResponseEntity<String> testResult = userController.addUser(user, result);
+
+		// THEN
+		assertEquals(HttpStatus.CONFLICT, testResult.getStatusCode());
+		assertEquals("Fail: User data is not valid.", testResult.getBody());
+	}
+
+	@Test
+	public void updateUser_ShouldReturnResponseEntityWithStatusOKAndMessageAsBody()
+			throws RessourceNotFoundException, AlreadyExistException {
+		// GIVEN
+		User user = new User();
+		BindingResult result = mock(BindingResult.class);
+
+		// WHEN
+		ResponseEntity<String> testResult = userController.updateUser(user, result);
 
 		// THEN
 		assertEquals(HttpStatus.OK, testResult.getStatusCode());
 		assertEquals("User has been updated in DataBase.", testResult.getBody());
+	}
+	
+	@Test
+	public void updateUser_ShouldReturnResponseEntityWithStatusCONFLICTAndMessageAsBody() throws RessourceNotFoundException, AlreadyExistException {
+		// GIVEN
+		User user = new User();
+		BindingResult result = mock(BindingResult.class);
+		when(result.hasErrors()).thenReturn(true);
+
+		// WHEN
+		ResponseEntity<String> testResult = userController.updateUser(user, result);
+
+		// THEN
+		assertEquals(HttpStatus.CONFLICT, testResult.getStatusCode());
+		assertEquals("Fail: User data is not valid.", testResult.getBody());
 	}
 
 	@Test
