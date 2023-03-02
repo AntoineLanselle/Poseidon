@@ -25,8 +25,8 @@ public class User {
 
 	@Column(name = "password")
 	@NotBlank(message = "Password is mandatory")
-	@Size(min = 2, max = 255, message = "Password size must be more than 8 characters")
-	@Pattern(regexp = "^(?=.*[0-9])(?=.*[A-Z])(?=.*[@%#$€]).{2,255}$", message = "Password must contain at least one number, one capital character and one special character")
+	@Size(min = 8, max = 255, message = "Password size must be more than 8 characters")
+	@Pattern(regexp = "^(?=.*[0-9])(?=.*[A-Z])(?=.*[@%#$€]).{8,255}$", message = "Password must contain at least one number, one capital character and one special character")
 	private String password;
 
 	@Column(name = "fullname")
