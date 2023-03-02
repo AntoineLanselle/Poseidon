@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CurvePointServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-boot-skeleton</a> &gt; <a href="index.source.html" class="el_package">com.nnk.springboot.services</a> &gt; <span class="el_source">CurvePointServiceImpl.java</span></div><h1>CurvePointServiceImpl.java</h1><pre class="source lang-java linenums">package com.nnk.springboot.services;
+
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.nnk.springboot.domain.CurvePoint;
+import com.nnk.springboot.exceptions.RessourceNotFoundException;
+import com.nnk.springboot.repositories.CurvePointRepository;
+
+/**
+ * Service implementation for CurvePoint.
+ * 
+ * @author Antoine Lanselle
+ */
+@Service
+<span class="fc" id="L20">public class CurvePointServiceImpl implements CurvePointService {</span>
+
+<span class="fc" id="L22">	private static final Logger LOGGER = LogManager.getLogger(CurvePointServiceImpl.class);</span>
+
+	@Autowired
+	private CurvePointRepository curvePointRepository;
+
+	/**
+	 * Return all Curves in DataBase.
+	 *
+	 * @return List&lt;CurvePoint&gt; all the Curves in the DataBase.
+	 */
+	@Override
+	public List&lt;CurvePoint&gt; findAllCurves() {
+<span class="fc" id="L34">		String info = &quot;Returning all Curves from DataBase.&quot;;</span>
+<span class="fc" id="L35">		LOGGER.info(info);</span>
+
+<span class="fc" id="L37">		return curvePointRepository.findAll();</span>
+	}
+
+	/**
+	 * Return specific Curve from DataBase with id in parameter.
+	 *
+	 * @param Integer the id of the Bid.
+	 * @return CurvePoint with id in parameter in DataBase.
+	 * @throw RessourceNotFoundException when id in parameter is not in DataBase.
+	 */
+	@Override
+	public CurvePoint findById(Integer id) throws RessourceNotFoundException {
+<span class="fc" id="L49">		String info = &quot;Looking for Curve with id &quot; + id + &quot; in DataBase.&quot;;</span>
+<span class="fc" id="L50">		String error = &quot;Fail: Curve with id &quot; + id + &quot; not found in DataBase.&quot;;</span>
+<span class="fc" id="L51">		LOGGER.info(info);</span>
+
+<span class="fc" id="L53">		return curvePointRepository.findById(id).orElseThrow(() -&gt; new RessourceNotFoundException(error));</span>
+	}
+
+	/**
+	 * Add Curve in parameter in DataBase.
+	 *
+	 * @param CurvePoint you want to add in DataBase.
+	 * @return CurvePoint the added Curve.
+	 */
+	@Override
+	public CurvePoint addCurvePoint(CurvePoint curvePoint) {
+<span class="fc" id="L64">		String info = &quot;Adding Curve in DataBase.&quot;;</span>
+<span class="fc" id="L65">		LOGGER.info(info);</span>
+
+<span class="fc" id="L67">		return curvePointRepository.save(curvePoint);</span>
+	}
+
+	/**
+	 * Update Curve with Curve id in parameter in DataBase with Curve in parameter.
+	 *
+	 * @param CurvePoint the new Curve data we want to update.
+	 * @return CurvePoint the updated Curve.
+	 * @throw RessourceNotFoundException when Curve id in parameter is not in
+	 *        DataBase.
+	 */
+	@Override
+	public CurvePoint updateCurvePoint(CurvePoint curvePoint) throws RessourceNotFoundException {
+<span class="fc" id="L80">		String info = &quot;Updating Curve in DataBase.&quot;;</span>
+<span class="fc" id="L81">		LOGGER.info(info);</span>
+
+<span class="fc bfc" id="L83" title="All 2 branches covered.">		if (curvePointRepository.existsById(curvePoint.getId())) {</span>
+<span class="fc" id="L84">			return curvePointRepository.save(curvePoint);</span>
+		} else {
+<span class="fc" id="L86">			String error = &quot;Fail: Curve with id &quot; + curvePoint.getId() + &quot; not found in DataBase.&quot;;</span>
+<span class="fc" id="L87">			throw new RessourceNotFoundException(error);</span>
+		}
+	}
+
+	/**
+	 * Delete Curve with Curve id in parameter from DataBase.
+	 *
+	 * @param CurvePoint the Curve you want to delete from DataBase.
+	 * @throw RessourceNotFoundException when Curve id in parameter is not in
+	 *        DataBase.
+	 */
+	@Override
+	public void deleteCurvePoint(CurvePoint curvePoint) throws RessourceNotFoundException {
+<span class="fc" id="L100">		String info = &quot;Deleting Curve in DataBase.&quot;;</span>
+<span class="fc" id="L101">		LOGGER.info(info);</span>
+
+<span class="fc bfc" id="L103" title="All 2 branches covered.">		if (curvePointRepository.existsById(curvePoint.getId())) {</span>
+<span class="fc" id="L104">			curvePointRepository.delete(curvePoint);</span>
+		} else {
+<span class="fc" id="L106">			String error = &quot;Fail: Curve with id &quot; + curvePoint.getId() + &quot; not found in DataBase.&quot;;</span>
+<span class="fc" id="L107">			throw new RessourceNotFoundException(error);</span>
+		}
+<span class="fc" id="L109">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ErrorPageController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-boot-skeleton</a> &gt; <a href="index.source.html" class="el_package">com.nnk.springboot.controllers</a> &gt; <span class="el_source">ErrorPageController.java</span></div><h1>ErrorPageController.java</h1><pre class="source lang-java linenums">package com.nnk.springboot.controllers;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.nnk.springboot.services.UserService;
+import com.nnk.springboot.domain.User;
+
+/**
+ * Controller for ErrorPage.
+ * 
+ * @author Antoine Lanselle
+ */
+@Controller
+<span class="nc" id="L24">public class ErrorPageController implements ErrorController {</span>
+
+<span class="nc" id="L26">	private static final Logger LOGGER = LogManager.getLogger(ErrorPageController.class);</span>
+
+	@Autowired
+	private UserService userService;
+
+	/**
+	 * Return the template page of the error in request in parameter.
+	 * 
+	 * @param Model for adding attributes.
+	 * @return String the template path.
+	 */
+	@RequestMapping(path = &quot;/error&quot;)
+	public String handleError(Model model, HttpServletRequest request) {
+<span class="nc" id="L39">		String info = &quot;GET - Error page.&quot;;</span>
+<span class="nc" id="L40">		LOGGER.info(info);</span>
+
+<span class="nc" id="L42">		User user = userService.getCurrentUser();</span>
+
+<span class="nc" id="L44">		model.addAttribute(&quot;userName&quot;, user.getUsername());</span>
+<span class="nc" id="L45">		model.addAttribute(&quot;role&quot;, user.getRole());</span>
+<span class="nc" id="L46">		String errorTitle = &quot;An error occured&quot;;</span>
+<span class="nc" id="L47">		String errorMessage = &quot;An unknown error occurred, try again.&quot;;</span>
+<span class="nc" id="L48">		Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);</span>
+
+<span class="nc bnc" id="L50" title="All 2 branches missed.">		if (status != null) {</span>
+<span class="nc" id="L51">			Integer statusCode = Integer.valueOf(status.toString());</span>
+
+<span class="nc bnc" id="L53" title="All 2 branches missed.">			if (statusCode == HttpStatus.NOT_FOUND.value()) {</span>
+<span class="nc" id="L54">				errorTitle = &quot;Not Found Exception&quot;;</span>
+<span class="nc" id="L55">				errorMessage = &quot;The page you are looking for does not exist.&quot;;</span>
+<span class="nc bnc" id="L56" title="All 2 branches missed.">			} else if (statusCode == HttpStatus.FORBIDDEN.value()) {</span>
+<span class="nc" id="L57">				errorTitle = &quot;Access Denied Exception&quot;;</span>
+<span class="nc" id="L58">				errorMessage = &quot;You do not have the rights to access this page.&quot;;</span>
+			}
+		}
+<span class="nc" id="L61">		model.addAttribute(&quot;errorTitle&quot;, errorTitle);</span>
+<span class="nc" id="L62">		model.addAttribute(&quot;errorMsg&quot;, errorMessage);</span>
+<span class="nc" id="L63">		return &quot;error&quot;;</span>
+	}
+
+	@Override
+	public String getErrorPath() {
+<span class="nc" id="L68">		return &quot;/error&quot;;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

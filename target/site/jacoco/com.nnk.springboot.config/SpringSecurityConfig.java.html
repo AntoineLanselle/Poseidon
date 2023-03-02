@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SpringSecurityConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-boot-skeleton</a> &gt; <a href="index.source.html" class="el_package">com.nnk.springboot.config</a> &gt; <span class="el_source">SpringSecurityConfig.java</span></div><h1>SpringSecurityConfig.java</h1><pre class="source lang-java linenums">package com.nnk.springboot.config;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import com.nnk.springboot.services.UserService;
+
+/**
+ * Spring Security configuration for application.
+ * 
+ * @author Antoine Lanselle
+ */
+@Configuration
+@EnableWebSecurity
+<span class="nc" id="L23">public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {</span>
+
+	@Autowired
+	private UserService userService;
+
+	@Bean
+	public static BCryptPasswordEncoder passwordEncoder() {
+<span class="nc" id="L30">		return new BCryptPasswordEncoder();</span>
+	}
+
+	@Bean
+	public DaoAuthenticationProvider authenticationProvider() {
+<span class="nc" id="L35">		DaoAuthenticationProvider auth = new DaoAuthenticationProvider();</span>
+<span class="nc" id="L36">		auth.setUserDetailsService(userService);</span>
+<span class="nc" id="L37">		auth.setPasswordEncoder(passwordEncoder());</span>
+<span class="nc" id="L38">		return auth;</span>
+	}
+
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) {
+<span class="nc" id="L43">		auth.authenticationProvider(authenticationProvider());</span>
+<span class="nc" id="L44">	}</span>
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+<span class="nc" id="L48">		http.csrf().disable()</span>
+<span class="nc" id="L49">				.authorizeRequests()</span>
+<span class="nc" id="L50">		 			.antMatchers(&quot;/user/**&quot;).hasAnyAuthority(&quot;ADMIN&quot;)</span>
+<span class="nc" id="L51">		 			.anyRequest().authenticated()</span>
+<span class="nc" id="L52">				.and()</span>
+<span class="nc" id="L53">					.formLogin().defaultSuccessUrl(&quot;/bidList/list&quot;, true)</span>
+<span class="nc" id="L54">				.and()</span>
+<span class="nc" id="L55">					.oauth2Login().defaultSuccessUrl(&quot;/bidList/list&quot;, true)</span>
+<span class="nc" id="L56">				.and()</span>
+<span class="nc" id="L57">					.logout().invalidateHttpSession(true).clearAuthentication(true)</span>
+<span class="nc" id="L58">					.logoutRequestMatcher(new AntPathRequestMatcher(&quot;/app-logout&quot;))</span>
+<span class="nc" id="L59">					.permitAll();</span>
+<span class="nc" id="L60">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

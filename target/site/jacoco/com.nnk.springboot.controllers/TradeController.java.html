@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TradeController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-boot-skeleton</a> &gt; <a href="index.source.html" class="el_package">com.nnk.springboot.controllers</a> &gt; <span class="el_source">TradeController.java</span></div><h1>TradeController.java</h1><pre class="source lang-java linenums">package com.nnk.springboot.controllers;
+
+import com.nnk.springboot.domain.Trade;
+import com.nnk.springboot.domain.User;
+import com.nnk.springboot.exceptions.RessourceNotFoundException;
+import com.nnk.springboot.services.TradeService;
+import com.nnk.springboot.services.UserService;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
+
+import javax.validation.Valid;
+
+/**
+ * Controller for Trade.
+ * 
+ * @author Antoine Lanselle
+ */
+@Controller
+@RequestMapping(path = &quot;/trade&quot;)
+<span class="fc" id="L37">public class TradeController {</span>
+
+<span class="fc" id="L39">	private static final Logger LOGGER = LogManager.getLogger(TradeController.class);</span>
+
+	@Autowired
+	private TradeService tradeService;
+	@Autowired
+	private UserService userService;
+
+	/**
+	 * Return the template list of all Trades in DataBase.
+	 * 
+	 * @param Model for adding attributes.
+	 * @return String the template path.
+	 */
+	@GetMapping(path = &quot;/list&quot;)
+	public String showTrades(Model model) {
+<span class="fc" id="L54">		String info = &quot;GET - Trade List page.&quot;;</span>
+<span class="fc" id="L55">		LOGGER.info(info);</span>
+
+<span class="fc" id="L57">		User user = userService.getCurrentUser();</span>
+
+<span class="fc" id="L59">		model.addAttribute(&quot;userName&quot;, user.getUsername());</span>
+<span class="fc" id="L60">		model.addAttribute(&quot;role&quot;, user.getRole());</span>
+<span class="fc" id="L61">		model.addAttribute(&quot;trades&quot;, tradeService.findAllTrades());</span>
+<span class="fc" id="L62">		return &quot;trade/list&quot;;</span>
+	}
+
+	/**
+	 * Show the form to add a Trade.
+	 * 
+	 * @param Trade the new Trade to be completed by the user.
+	 * @return String of the template path.
+	 */
+	@GetMapping(path = &quot;/add&quot;)
+	public String addTradeForm(Trade trade) {
+<span class="fc" id="L73">		String info = &quot;GET - Creat Trade form.&quot;;</span>
+<span class="fc" id="L74">		LOGGER.info(info);</span>
+
+<span class="fc" id="L76">		return &quot;trade/add&quot;;</span>
+	}
+
+	/**
+	 * Add Trade in parameter in DataBase, and redirect to list.
+	 * 
+	 * @param Trade         the Trade you want to add in DataBase.
+	 * @param BindingResult verification if Trade in parameter is valid with
+	 *                      constraints.
+	 * @param Model         for adding attributes.
+	 * 
+	 * @return String the template path.
+	 */
+	@PostMapping(path = &quot;/validate&quot;)
+	public String validateTrade(@Valid Trade trade, BindingResult result, Model model) {
+<span class="fc" id="L91">		String info = &quot;POST - Add new Trade.&quot;;</span>
+
+<span class="fc bfc" id="L93" title="All 2 branches covered.">		if (!result.hasErrors()) {</span>
+<span class="fc" id="L94">			LOGGER.info(info);</span>
+
+<span class="fc" id="L96">			tradeService.addTrade(trade);</span>
+<span class="fc" id="L97">			model.addAttribute(&quot;trades&quot;, tradeService.findAllTrades());</span>
+<span class="fc" id="L98">			return &quot;redirect:/trade/list&quot;;</span>
+		} else {
+<span class="fc" id="L100">			info = info + &quot; Fail: Trade data is not valid.&quot;;</span>
+<span class="fc" id="L101">			LOGGER.info(info);</span>
+
+<span class="fc" id="L103">			return &quot;trade/add&quot;;</span>
+		}
+	}
+
+	/**
+	 * Show update form for Trade with id in parameter.
+	 * 
+	 * @param Integer the id of the Trade you want to update.
+	 * @param Model   for adding attributes.
+	 * 
+	 * @return String the template path.
+	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
+	 */
+	@GetMapping(path = &quot;/update/{id}&quot;)
+	public String showUpdateTradeForm(@PathVariable(&quot;id&quot;) Integer id, Model model) throws RessourceNotFoundException {
+<span class="fc" id="L118">		String info = &quot;GET - Update form for Trade &quot; + id + &quot;.&quot;;</span>
+<span class="fc" id="L119">		LOGGER.info(info);</span>
+
+<span class="fc" id="L121">		Trade trade = tradeService.findById(id);</span>
+<span class="fc" id="L122">		model.addAttribute(&quot;trade&quot;, trade);</span>
+<span class="fc" id="L123">		return &quot;trade/update&quot;;</span>
+	}
+
+	/**
+	 * Update Trade with id in parameter in DataBase with Trade in parameter, and
+	 * redirect to list.
+	 * 
+	 * @param Integer       the id of the Trade you want to update.
+	 * @param Trade         the new Trade data to update.
+	 * @param BindingResult verification if Trade in parameter is valid with
+	 *                      constraints.
+	 * @param Model         for adding attributes.
+	 * 
+	 * @return String the template path.
+	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
+	 */
+	@PostMapping(path = &quot;/update/{id}&quot;)
+	public String updateTrade(@PathVariable(&quot;id&quot;) Integer id, @Valid Trade trade, BindingResult result, Model model)
+			throws RessourceNotFoundException {
+<span class="fc" id="L142">		String info = &quot;POST - Update Trade &quot; + id + &quot;.&quot;;</span>
+
+<span class="fc bfc" id="L144" title="All 2 branches covered.">		if (!result.hasErrors()) {</span>
+<span class="fc" id="L145">			LOGGER.info(info);</span>
+
+<span class="fc" id="L147">			trade.setId(id);</span>
+<span class="fc" id="L148">			tradeService.updateTrade(trade);</span>
+
+<span class="fc" id="L150">			model.addAttribute(&quot;trades&quot;, tradeService.findAllTrades());</span>
+<span class="fc" id="L151">			return &quot;redirect:/trade/list&quot;;</span>
+		} else {
+<span class="fc" id="L153">			info = info + &quot; Fail: new Trade datas are not valid.&quot;;</span>
+<span class="fc" id="L154">			LOGGER.info(info);</span>
+
+<span class="fc" id="L156">			return &quot;trade/update&quot;;</span>
+		}
+	}
+
+	/**
+	 * Delete Trade with id in parameter from DataBase, and redirect to list.
+	 * 
+	 * @param Integer the id of the Trade you want to delete.
+	 * @param Model   for adding attributes.
+	 * 
+	 * @return String the template path.
+	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
+	 */
+	@GetMapping(path = &quot;/delete/{id}&quot;)
+	public String deleteTrade(@PathVariable(&quot;id&quot;) Integer id, Model model) throws RessourceNotFoundException {
+<span class="fc" id="L171">		String info = &quot;GET - Delete Trade &quot; + id + &quot;.&quot;;</span>
+<span class="fc" id="L172">		LOGGER.info(info);</span>
+
+<span class="fc" id="L174">		Trade trade = tradeService.findById(id);</span>
+<span class="fc" id="L175">		tradeService.deleteTrade(trade);</span>
+
+<span class="fc" id="L177">		model.addAttribute(&quot;trades&quot;, tradeService.findAllTrades());</span>
+<span class="fc" id="L178">		return &quot;redirect:/trade/list&quot;;</span>
+	}
+
+	/**
+	 * API request - Return all Trades in DataBase.
+	 * 
+	 * @return ResponseEntity&lt;List&lt;Trade&gt; a response with https status OK and a
+	 *         Trade List of all Trades in DataBase as body.
+	 */
+	@GetMapping(path = &quot;/all&quot;)
+	public ResponseEntity&lt;List&lt;Trade&gt;&gt; getTrades() {
+<span class="fc" id="L189">		String info = &quot;API GET - Trade List of all Trades.&quot;;</span>
+<span class="fc" id="L190">		LOGGER.info(info);</span>
+
+<span class="fc" id="L192">		return ResponseEntity.status(HttpStatus.OK).body(tradeService.findAllTrades());</span>
+	}
+
+	/**
+	 * API request - Return the Trade with id in parameter.
+	 * 
+	 * @param Integer the id of the Trade you want to get.
+	 * @return ResponseEntity&lt;Trade&gt; a response with https status OK and a Trade as
+	 *         body.
+	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
+	 */
+	@GetMapping()
+	public ResponseEntity&lt;Trade&gt; getTrade(@RequestParam(name = &quot;id&quot;, required = true) Integer id)
+			throws RessourceNotFoundException {
+<span class="fc" id="L206">		String info = &quot;API GET - Trade with id: &quot; + id + &quot;.&quot;;</span>
+<span class="fc" id="L207">		LOGGER.info(info);</span>
+
+<span class="fc" id="L209">		return ResponseEntity.status(HttpStatus.OK).body(tradeService.findById(id));</span>
+	}
+
+	/**
+	 * API request - Add the Trade in parameter in DataBase and return https status
+	 * OK with message or CONFLICT if trade data is not valid.
+	 * 
+	 * @param Trade the Trade data to add in DataBase.
+	 * @return ResponseEntity&lt;String&gt; response with https status OK and message as
+	 *         body or CONFLICT if trade data is not valid.
+	 */
+	@PostMapping()
+	public ResponseEntity&lt;String&gt; addTrade(@RequestBody @Valid Trade trade, BindingResult result) {
+<span class="fc" id="L222">		String info = &quot;API POST - Add Trade.&quot;;</span>
+
+<span class="fc bfc" id="L224" title="All 2 branches covered.">		if (!result.hasErrors()) {</span>
+<span class="fc" id="L225">			LOGGER.info(info);</span>
+
+<span class="fc" id="L227">			tradeService.addTrade(trade);</span>
+<span class="fc" id="L228">			String msg = &quot;Trade has been added in DataBase.&quot;;</span>
+<span class="fc" id="L229">			return ResponseEntity.status(HttpStatus.OK).body(msg);</span>
+		} else {
+<span class="fc" id="L231">			String msg = &quot;Fail: Trade data is not valid.&quot;;</span>
+<span class="fc" id="L232">			info = info + msg;</span>
+<span class="fc" id="L233">			LOGGER.info(info);</span>
+
+<span class="fc" id="L235">			return ResponseEntity.status(HttpStatus.CONFLICT).body(msg);</span>
+		}
+	}
+
+	/**
+	 * API request - Update the Trade with id in parameter in DataBase with Trade
+	 * data in parameter and return https status OK with message or CONFLICT if
+	 * trade data is not valid.
+	 * 
+	 * @param Trade the Trade data to put in DataBase.
+	 * @return ResponseEntity&lt;String&gt; response with https status OK and message as
+	 *         body or CONFLICT if trade data is not valid.
+	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
+	 */
+	@PutMapping()
+	public ResponseEntity&lt;String&gt; updateTrade(@RequestBody @Valid Trade trade, BindingResult result)
+			throws RessourceNotFoundException {
+<span class="fc" id="L252">		String info = &quot;API UPDATE - Update Trade.&quot;;</span>
+
+<span class="fc bfc" id="L254" title="All 2 branches covered.">		if (!result.hasErrors()) {</span>
+<span class="fc" id="L255">			LOGGER.info(info);</span>
+
+<span class="fc" id="L257">			tradeService.updateTrade(trade);</span>
+<span class="fc" id="L258">			String msg = &quot;Trade has been updated in DataBase.&quot;;</span>
+<span class="fc" id="L259">			return ResponseEntity.status(HttpStatus.OK).body(msg);</span>
+		} else {
+<span class="fc" id="L261">			String msg = &quot;Fail: Trade data is not valid.&quot;;</span>
+<span class="fc" id="L262">			info = info + msg;</span>
+<span class="fc" id="L263">			LOGGER.info(info);</span>
+
+<span class="fc" id="L265">			return ResponseEntity.status(HttpStatus.CONFLICT).body(msg);</span>
+		}
+	}
+
+	/**
+	 * API request - Delete Trade with id in parameter from DataBase.
+	 * 
+	 * @param Integer the id of the Trade you want to delete.
+	 * @return ResponseEntity&lt;String&gt; response with https status OK and message as
+	 *         body.
+	 * @throws RessourceNotFoundException when id in parameter is not in DataBase.
+	 * 
+	 */
+	@DeleteMapping()
+	public ResponseEntity&lt;String&gt; deleteTrade(@RequestParam(name = &quot;id&quot;, required = true) Integer id)
+			throws RessourceNotFoundException {
+<span class="fc" id="L281">		String info = &quot;API DELETE - Trade with id: &quot; + id + &quot;.&quot;;</span>
+<span class="fc" id="L282">		LOGGER.info(info);</span>
+
+<span class="fc" id="L284">		tradeService.deleteTrade(tradeService.findById(id));</span>
+<span class="fc" id="L285">		String msg = &quot;Trade with id: &quot; + id + &quot; has been delete from DataBase.&quot;;</span>
+<span class="fc" id="L286">		return ResponseEntity.status(HttpStatus.OK).body(msg);</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>
