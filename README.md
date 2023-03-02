@@ -17,11 +17,11 @@ With PayMyBuddy, you will be able to:
 
 ## Installation
 
-# Database
+### Database
 
 To create the database, open your SGBD and run the script doc/data.sql
 
-# Application
+### Application
 
 1. Clone the source repository using Git.
 2. Open your IDE, and run PayMyBuddyApplication.java to launch the application.
